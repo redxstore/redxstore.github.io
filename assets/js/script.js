@@ -17,7 +17,9 @@ const searchStatus = document.querySelector('#search-status');
 const searchResults = document.querySelector('#search-results');
 const productDetailDialog = document.querySelector('#product-detail-dialog');
 const productDetailContent = document.querySelector('#product-detail-content');
-const productMoneyRain = document.querySelector('#product-money-rain'); const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches   && !document.documentElement.classList.contains('android-motion-enabled');
+const productMoneyRain = document.querySelector('#product-money-rain');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  && !document.documentElement.classList.contains('android-motion-enabled');
 const sizeChartDialog = document.querySelector('#size-chart-dialog');
 const sizeChartImage = document.querySelector('#size-chart-image');
 const sizeChartCloseButton = document.querySelector('[data-size-chart-close]');
@@ -30,8 +32,12 @@ const checkoutQrisSection = document.querySelector('#checkout-qris');
 const checkoutQrisAmount = document.querySelector('#checkout-qris-amount');
 const checkoutQrisImage = document.querySelector('#checkout-qris-image');
 const checkoutWhatsAppLink = document.querySelector('#checkout-whatsapp-link');
+const storeVideoPlayer = document.querySelector('#store-video-player');
+const storeVideoEmpty = document.querySelector('#store-video-empty');
 const adminOrderList = document.querySelector('#admin-order-list');
 const adminOrdersEmpty = document.querySelector('#admin-orders-empty');
+const isAndroid = /Android/i.test(navigator.userAgent);
+document.documentElement.classList.toggle('android-device', isAndroid);
 const cartButton = document.querySelector('#cart-open');
 const cartPopover = document.querySelector('#cart-popover');
 const cartCount = document.querySelector('#cart-count');
@@ -46,6 +52,9 @@ const adminPanel = document.querySelector('#admin-panel');
 const adminQrisPanel = document.querySelector('#admin-qris-panel');
 const adminQrisOpenButton = document.querySelector('#admin-qris-open');
 const adminQrisCloseButtons = [...document.querySelectorAll('[data-admin-qris-close]')];
+const adminStoreVideoPanel = document.querySelector('#admin-store-video-panel');
+const adminStoreVideoOpenButton = document.querySelector('#admin-store-video-open');
+const adminStoreVideoCloseButtons = [...document.querySelectorAll('[data-admin-store-video-close]')];
 const adminLoginDialog = document.querySelector('#admin-login-dialog');
 const adminLoginForm = document.querySelector('#admin-login-form');
 const adminLoginEmail = document.querySelector('#admin-login-email');
@@ -77,6 +86,12 @@ const adminQrisImageInput = document.querySelector('#admin-qris-image');
 const adminQrisPreviewImage = document.querySelector('#admin-qris-preview-image');
 const adminQrisStatus = document.querySelector('#admin-qris-status');
 const adminQrisSaveButton = document.querySelector('#admin-qris-save');
+const adminStoreVideoForm = document.querySelector('#admin-store-video-form');
+const adminStoreVideoInput = document.querySelector('#admin-store-video-file');
+const adminStoreVideoPreview = document.querySelector('#admin-store-video-preview');
+const adminStoreVideoEmpty = document.querySelector('#admin-store-video-empty');
+const adminStoreVideoStatus = document.querySelector('#admin-store-video-status');
+const adminStoreVideoSaveButton = document.querySelector('#admin-store-video-save');
 const adminProductImageObjectUrls = new Map();
 let adminProductSizeChartObjectUrl = null;
 let adminProductRemoveSizeChart = false;
@@ -96,6 +111,7 @@ const cartStorageKey = 'redx-cart';
 const wishlistStorageKey = 'redx-wishlist';
 const SUPABASE_PRODUCT_BUCKET = 'product-images';
 const SUPABASE_QRIS_BUCKET = 'qris-images';
+const SUPABASE_STORE_VIDEO_BUCKET = 'store-videos';
 const SUPABASE_SIZE_CHART_BUCKET = 'size-chart-images';
 const DEFAULT_QRIS_IMAGE = 'assets/images/qris-code.png';
 const MAX_PRODUCT_IMAGES = 10;
@@ -112,6 +128,8 @@ const adminProductDetectedColorsByFile = new Map();
 let adminImageSelectionVersion = 0;
 let qrisImageObjectUrl = null;
 let savedQrisImagePath = null;
+let storeVideoObjectUrl = null;
+let savedStoreVideoPath = null;
 const adminProductPreviewDatabaseName = 'redx-admin-product-preview';
 const adminProductPreviewStoreName = 'products';
 const adminCategoryPreviewStoreName = 'categories';
@@ -335,6 +353,22 @@ function updateNavbar() {
   navbar.classList.toggle('is-scrolled', window.scrollY > 24);
 }
 
+let navbarUpdateScheduled = false;
+
+function scheduleNavbarUpdate() {
+  if (!isAndroid) {
+    updateNavbar();
+    return;
+  }
+
+  if (navbarUpdateScheduled) return;
+  navbarUpdateScheduled = true;
+  window.requestAnimationFrame(() => {
+    navbarUpdateScheduled = false;
+    updateNavbar();
+  });
+}
+
 function updateClock() {
   const now = new Date();
   currentTime.textContent = new Intl.DateTimeFormat('id-ID', {
@@ -366,7 +400,25 @@ function resetIndicator() {
   moveIndicator(desktopNav?.querySelector('.nav-link.is-current') || navLinks[0]);
 }
 
+function alignMobileMenuWithDate() {
+  const dateItem = document.querySelector('.header-date-item');
+  if (!dateItem || window.innerWidth > 1023) {
+    mobileMenu.style.removeProperty('left');
+    mobileMenu.style.removeProperty('right');
+    mobileMenu.style.removeProperty('width');
+    return;
+  }
+
+  const dateBounds = dateItem.getBoundingClientRect();
+  const left = Math.max(16, Math.min(dateBounds.left, window.innerWidth - 16));
+  const width = Math.min(dateBounds.width, window.innerWidth - left - 16);
+  mobileMenu.style.left = `${left}px`;
+  mobileMenu.style.right = 'auto';
+  mobileMenu.style.width = `${width}px`;
+}
+
 function setMobileMenu(open) {
+  if (open) alignMobileMenuWithDate();
   document.body.classList.toggle('menu-open', open);
   menuButton.classList.toggle('is-active', open);
   menuButton.setAttribute('aria-expanded', String(open));
@@ -434,7 +486,7 @@ function formatRupiah(amount) {
 
 function getSupabaseClient() {
   if (!window.rdxSupabaseClient) {
-    throw new Error('Supabase belum siap. Buka website melalui Live Server atau hosting dan muat ulang halaman.');
+    throw new Error('Penyimpanan online belum siap. Buka website melalui Live Server atau hosting dan muat ulang halaman.');
   }
   return window.rdxSupabaseClient;
 }
@@ -465,8 +517,125 @@ async function loadQrisImageSetting() {
   checkoutQrisImage.src = imageUrl;
   adminQrisPreviewImage.src = imageUrl;
   adminQrisStatus.textContent = savedQrisImagePath
-    ? 'QRIS tersimpan di Supabase.'
+    ? 'QRIS tersimpan online.'
     : 'QRIS bawaan sedang digunakan.';
+}
+
+function getStoreVideoUrl(videoPath) {
+  if (!videoPath) return '';
+  return getSupabaseClient().storage.from(SUPABASE_STORE_VIDEO_BUCKET).getPublicUrl(videoPath).data.publicUrl;
+}
+
+function resetStoreVideoAspectRatio(video) {
+  const container = video.closest('.store-video');
+  if (!container) return;
+  container.style.removeProperty('aspect-ratio');
+  container.style.removeProperty('width');
+}
+
+function syncStoreVideoAspectRatio(video) {
+  const container = video.closest('.store-video');
+  if (!container || !video.videoWidth || !video.videoHeight) return;
+  const ratio = video.videoWidth / video.videoHeight;
+  const maxWidth = Number.parseFloat(getComputedStyle(container).getPropertyValue('--video-max-width'));
+  const maxHeight = Number.parseFloat(getComputedStyle(container).getPropertyValue('--video-max-height'));
+  const availableWidth = container.parentElement.clientWidth;
+  const width = Math.min(availableWidth, maxWidth, maxHeight * ratio);
+  container.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+  container.style.width = `${width}px`;
+}
+
+[storeVideoPlayer, adminStoreVideoPreview].forEach((video) => {
+  video.addEventListener('loadedmetadata', () => {
+    syncStoreVideoAspectRatio(video);
+    video.defaultMuted = false;
+    video.muted = false;
+    video.volume = 1;
+  });
+  video.addEventListener('play', () => {
+    video.defaultMuted = false;
+    video.muted = false;
+    video.volume = 1;
+  });
+});
+
+function getStoreVideoPlaybackError(video) {
+  switch (video.error?.code) {
+    case 1:
+      return 'Pemutaran video dibatalkan.';
+    case 2:
+      return 'Video gagal dimuat karena masalah jaringan.';
+    case 3:
+      return 'Video tidak dapat diproses. Pastikan codec video dan audio didukung browser.';
+    case 4:
+      return 'Format video atau alamat file tidak didukung.';
+    default:
+      return 'Video gagal diputar. Coba muat ulang halaman.';
+  }
+}
+
+storeVideoPlayer.addEventListener('error', () => {
+  if (!storeVideoPlayer.currentSrc) return;
+  storeVideoPlayer.hidden = true;
+  storeVideoEmpty.hidden = false;
+  storeVideoEmpty.textContent = getStoreVideoPlaybackError(storeVideoPlayer);
+});
+
+adminStoreVideoPreview.addEventListener('error', () => {
+  if (!adminStoreVideoPreview.currentSrc) return;
+  adminStoreVideoPreview.hidden = true;
+  adminStoreVideoEmpty.hidden = false;
+  adminStoreVideoStatus.textContent = getStoreVideoPlaybackError(adminStoreVideoPreview);
+  adminStoreVideoStatus.classList.add('is-error');
+});
+
+window.addEventListener('resize', () => {
+  [storeVideoPlayer, adminStoreVideoPreview].forEach(syncStoreVideoAspectRatio);
+});
+
+function showStoreVideo(videoPath) {
+  const videoUrl = getStoreVideoUrl(videoPath);
+  storeVideoPlayer.pause();
+  adminStoreVideoPreview.pause();
+  [storeVideoPlayer, adminStoreVideoPreview].forEach((video) => {
+    video.defaultMuted = false;
+    video.muted = false;
+    video.volume = 1;
+  });
+  resetStoreVideoAspectRatio(storeVideoPlayer);
+  resetStoreVideoAspectRatio(adminStoreVideoPreview);
+  storeVideoPlayer.hidden = !videoUrl;
+  storeVideoEmpty.hidden = Boolean(videoUrl);
+  adminStoreVideoPreview.hidden = !videoUrl;
+  adminStoreVideoEmpty.hidden = Boolean(videoUrl);
+  storeVideoEmpty.textContent = videoUrl ? 'Video toko gagal dimuat.' : 'Video toko belum tersedia.';
+  adminStoreVideoEmpty.textContent = videoUrl ? 'Video toko gagal dimuat.' : 'Belum ada video toko.';
+  if (videoUrl) {
+    storeVideoPlayer.src = videoUrl;
+    adminStoreVideoPreview.src = videoUrl;
+    storeVideoPlayer.load();
+    adminStoreVideoPreview.load();
+  } else {
+    storeVideoPlayer.removeAttribute('src');
+    adminStoreVideoPreview.removeAttribute('src');
+    storeVideoPlayer.load();
+    adminStoreVideoPreview.load();
+  }
+}
+
+async function loadStoreVideoSetting() {
+  const { data, error } = await getSupabaseClient()
+    .from('store_settings')
+    .select('value')
+    .eq('key', 'store_video_path')
+    .maybeSingle();
+  if (error) throw error;
+  savedStoreVideoPath = data?.value || null;
+  showStoreVideo(savedStoreVideoPath);
+  adminStoreVideoStatus.textContent = savedStoreVideoPath
+    ? 'Video toko tersimpan online.'
+    : 'Belum ada video toko.';
+  adminStoreVideoStatus.classList.remove('is-error');
 }
 
 function productFromSupabaseRow(row) {
@@ -591,7 +760,7 @@ async function loadAdminProductPreview() {
     renderProductGrid();
     renderAdminCatalogManagement();
   } catch (error) {
-    showNotice(`Produk Supabase gagal dimuat: ${error.message}`);
+    showNotice(`Produk gagal dimuat: ${error.message}`);
   }
 }
 
@@ -607,7 +776,7 @@ async function initializeAdminPreview() {
           updateAdminLoginButton();
           return loadAdminOrderPreviews();
         }).catch((authError) => {
-          showNotice(`Status admin Supabase gagal diperiksa: ${authError.message}`);
+          showNotice(`Status admin gagal diperiksa: ${authError.message}`);
         });
       } else {
         previewOrders = [];
@@ -621,7 +790,7 @@ async function initializeAdminPreview() {
     adminPreviewAuthenticated = user ? await isSupabaseAdmin(user) : false;
   } catch (error) {
     adminPreviewAuthenticated = false;
-    showNotice(`Koneksi Supabase gagal: ${error.message}`);
+    showNotice(`Koneksi penyimpanan gagal: ${error.message}`);
   }
   await loadAdminProductPreview();
   try {
@@ -630,11 +799,18 @@ async function initializeAdminPreview() {
     adminQrisStatus.textContent = `Pengaturan QRIS gagal dimuat: ${error.message}`;
     adminQrisStatus.classList.add('is-error');
   }
+  try {
+    await loadStoreVideoSetting();
+  } catch (error) {
+    adminStoreVideoStatus.textContent = `Video toko gagal dimuat: ${error.message}`;
+    adminStoreVideoStatus.classList.add('is-error');
+    showNotice(`Video toko gagal dimuat: ${error.message}`);
+  }
   await loadAdminCategoryPreview();
   await loadAdminOrderPreviews();
-  document.querySelector('.admin-local-note').textContent = 'SUPABASE · PRODUK TERSIMPAN PERMANEN';
-  document.querySelector('#admin-product-save-note').textContent = 'Produk dan gambar disimpan di Supabase.';
-  adminProductImageStatus.textContent = 'Gambar diupload ke Supabase Storage saat produk disimpan.';
+  document.querySelector('.admin-local-note').textContent = 'KATALOG TERSINKRON';
+  document.querySelector('#admin-product-save-note').textContent = 'Produk dan gambar disimpan online.';
+  adminProductImageStatus.textContent = 'Gambar diunggah saat produk disimpan.';
   updateAdminLoginButton();
   selectAdminTab(savedAdminSessionState.activeTab);
   if (adminPreviewAuthenticated && savedAdminSessionState.panelOpen) setAdminPanel(true);
@@ -1189,7 +1365,7 @@ function renderAdminCatalogManagement() {
     deleteButton.type = 'button';
     deleteButton.disabled = false;
     deleteButton.addEventListener('click', async () => {
-      if (!window.confirm(`Hapus produk "${product.name}" dari Supabase?`)) return;
+      if (!window.confirm(`Hapus produk "${product.name}" dari katalog online?`)) return;
       deleteButton.disabled = true;
       try {
         const { error } = await getSupabaseClient()
@@ -1217,10 +1393,10 @@ function renderAdminCatalogManagement() {
         }
         renderProductGrid();
         renderAdminCatalogManagement();
-        showNotice(`${product.name} dihapus dari Supabase.${cleanupWarning}`);
+        showNotice(`${product.name} dihapus dari katalog online.${cleanupWarning}`);
       } catch (error) {
         deleteButton.disabled = false;
-        showNotice(`Produk gagal dihapus dari Supabase: ${error.message}`);
+        showNotice(`Produk gagal dihapus: ${error.message}`);
       }
     });
     actions.append(editButton, deleteButton);
@@ -1258,7 +1434,7 @@ function renderAdminOrderPreviews() {
       createElement('strong', '', order.id),
       createElement('small', '', new Date(order.createdAt).toLocaleString('id-ID'))
     );
-    heading.append(orderInfo, createElement('span', 'admin-draft-badge', 'SUPABASE'));
+    heading.append(orderInfo, createElement('span', 'admin-draft-badge', 'ONLINE'));
     card.append(heading);
 
     order.items.forEach((item) => {
@@ -1302,7 +1478,7 @@ async function loadAdminOrderPreviews() {
     previewOrders = await getAdminOrderPreviewRecords();
     renderAdminOrderPreviews();
   } catch (error) {
-    showNotice(`Pesanan Supabase gagal dimuat: ${error.message}`);
+    showNotice(`Pesanan gagal dimuat: ${error.message}`);
   }
 }
 
@@ -1344,10 +1520,10 @@ async function createAdminOrderPreview() {
     saveCart();
     renderCart();
     checkoutDialog.close();
-    showNotice('Pesanan tersimpan permanen di Supabase. WhatsApp akan dibuka untuk mengirim bukti pembayaran.');
+    showNotice('Pesanan tersimpan permanen. WhatsApp akan dibuka untuk mengirim bukti pembayaran.');
     return true;
   } catch (error) {
-    showNotice(`Pesanan gagal disimpan ke Supabase: ${error.message}`);
+    showNotice(`Pesanan gagal disimpan: ${error.message}`);
     return false;
   } finally {
     checkoutCreateOrderButton.disabled = false;
@@ -1590,7 +1766,7 @@ function resetAdminProductForm() {
   adminProductSizeChartStatus.textContent = 'Belum ada size chart khusus untuk produk ini.';
   adminProductSizeChartStatus.classList.remove('is-error');
   clearAdminProductImagePreviews();
-  adminProductImageStatus.textContent = 'Gambar diupload ke Supabase Storage saat produk disimpan.';
+  adminProductImageStatus.textContent = 'Gambar diunggah saat produk disimpan.';
   adminProductImageStatus.classList.remove('is-error');
   adminProductSubmit.disabled = false;
   adminProductSubmit.textContent = 'Simpan Permanen';
@@ -1947,13 +2123,13 @@ async function saveAdminProduct(event) {
     adminProductPreviewButton.dataset.productId = savedProduct.id;
     adminProductPreviewButton.hidden = false;
     persistAdminSessionState({ lastSavedProductId: savedProduct.id });
-    showNotice(`${savedProduct.name} tersimpan di Supabase.${cleanupWarning}`);
+    showNotice(`${savedProduct.name} tersimpan online.${cleanupWarning}`);
   } catch (error) {
     if (!productSaved && uploadedImagePaths.length > 0) {
       const { error: cleanupError } = await getSupabaseClient()
         .storage.from(SUPABASE_PRODUCT_BUCKET).remove(uploadedImagePaths);
       if (cleanupError) {
-        console.error('Gagal membersihkan gambar Supabase setelah penyimpanan produk gagal:', cleanupError);
+        console.error('Gagal membersihkan gambar setelah penyimpanan produk gagal:', cleanupError);
       }
     }
     if (!productSaved && uploadedSizeChartPath) {
@@ -2291,7 +2467,10 @@ function setAdminPanel(open) {
   adminPanel.classList.toggle('is-open', open);
   adminPanel.setAttribute('aria-hidden', String(!open));
   adminPanel.inert = !open;
-  document.body.classList.toggle('admin-open', open || adminQrisPanel.classList.contains('is-open'));
+  document.body.classList.toggle(
+    'admin-open',
+    open || adminQrisPanel.classList.contains('is-open') || adminStoreVideoPanel.classList.contains('is-open')
+  );
   if (open) adminCloseButtons.at(-1)?.focus();
   else adminOpenButton.focus();
 }
@@ -2300,9 +2479,25 @@ function setAdminQrisPanel(open) {
   adminQrisPanel.classList.toggle('is-open', open);
   adminQrisPanel.setAttribute('aria-hidden', String(!open));
   adminQrisPanel.inert = !open;
-  document.body.classList.toggle('admin-open', open || adminPanel.classList.contains('is-open'));
+  document.body.classList.toggle(
+    'admin-open',
+    open || adminPanel.classList.contains('is-open') || adminStoreVideoPanel.classList.contains('is-open')
+  );
   if (open) adminQrisCloseButtons.at(-1)?.focus();
   else adminQrisOpenButton.focus();
+}
+
+function setAdminStoreVideoPanel(open) {
+  if (open && !adminPreviewAuthenticated) return;
+  adminStoreVideoPanel.classList.toggle('is-open', open);
+  adminStoreVideoPanel.setAttribute('aria-hidden', String(!open));
+  adminStoreVideoPanel.inert = !open;
+  document.body.classList.toggle(
+    'admin-open',
+    open || adminPanel.classList.contains('is-open') || adminQrisPanel.classList.contains('is-open')
+  );
+  if (open) adminStoreVideoCloseButtons.at(-1)?.focus();
+  else adminStoreVideoOpenButton.focus();
 }
 
 function selectAdminTab(tabName) {
@@ -2324,8 +2519,9 @@ function updateAdminLoginButton() {
   adminOpenButton.title = adminPreviewAuthenticated ? 'Edit Admin' : 'Login Admin';
 }
 
-window.addEventListener('scroll', updateNavbar, { passive: true });
+window.addEventListener('scroll', scheduleNavbarUpdate, { passive: true });
 window.addEventListener('resize', resetIndicator);
+window.addEventListener('resize', alignMobileMenuWithDate);
 updateClock();
 window.setInterval(updateClock, 1000);
 updateNavbar();
@@ -2428,6 +2624,10 @@ adminQrisOpenButton.addEventListener('click', () => {
   setAdminPanel(false);
   setAdminQrisPanel(true);
 });
+adminStoreVideoOpenButton.addEventListener('click', () => {
+  setAdminPanel(false);
+  setAdminStoreVideoPanel(true);
+});
 adminProductImageInput.addEventListener('change', async () => {
   const selectionVersion = ++adminImageSelectionVersion;
   const files = [...adminProductImageInput.files];
@@ -2504,10 +2704,11 @@ adminProductImageInput.addEventListener('change', async () => {
   const detectedColors = [...getDetectedAdminProductColors()];
   const failedDetectionCount = detectedColorResults.filter((result) => !result.color).length;
   const colorNames = detectedColors.map((color) => productColors[color]).join(', ');
-  adminProductImageStatus.textContent = `${existingImageCount + selectedFiles.length} dari maksimal ${MAX_PRODUCT_IMAGES} gambar siap. Perkiraan warna dominan: ${colorNames || 'tidak terdeteksi'}${failedDetectionCount ? `; ${failedDetectionCount} gambar perlu dipilih warnanya manual` : ''}. Gambar diupload ke Supabase Storage saat produk disimpan.`;
+  adminProductImageStatus.textContent = `${existingImageCount + selectedFiles.length} dari maksimal ${MAX_PRODUCT_IMAGES} gambar siap. Perkiraan warna dominan: ${colorNames || 'tidak terdeteksi'}${failedDetectionCount ? `; ${failedDetectionCount} gambar perlu dipilih warnanya manual` : ''}. Gambar diunggah saat produk disimpan.`;
 });
 adminCloseButtons.forEach((button) => button.addEventListener('click', () => setAdminPanel(false)));
 adminQrisCloseButtons.forEach((button) => button.addEventListener('click', () => setAdminQrisPanel(false)));
+adminStoreVideoCloseButtons.forEach((button) => button.addEventListener('click', () => setAdminStoreVideoPanel(false)));
 document.querySelector('#admin-login-close').addEventListener('click', () => adminLoginDialog.close());
 sizeChartCloseButton.addEventListener('click', () => sizeChartDialog.close());
 sizeChartDialog.addEventListener('click', (event) => {
@@ -2537,6 +2738,29 @@ adminQrisImageInput.addEventListener('change', () => {
   adminQrisPreviewImage.src = qrisImageObjectUrl;
   adminQrisStatus.textContent = 'Pratinjau QRIS siap. Klik Simpan QRIS untuk menyimpan perubahan.';
   adminQrisStatus.classList.remove('is-error');
+});
+
+adminStoreVideoInput.addEventListener('change', () => {
+  const [file] = adminStoreVideoInput.files;
+  if (!file) return;
+  if (!['video/mp4', 'video/webm'].includes(file.type) || file.size > 50 * 1024 * 1024) {
+    adminStoreVideoStatus.textContent = 'Pilih video MP4 atau WebM berukuran maksimal 50 MB.';
+    adminStoreVideoStatus.classList.add('is-error');
+    adminStoreVideoInput.value = '';
+    return;
+  }
+  if (storeVideoObjectUrl) URL.revokeObjectURL(storeVideoObjectUrl);
+  storeVideoObjectUrl = URL.createObjectURL(file);
+  resetStoreVideoAspectRatio(adminStoreVideoPreview);
+  adminStoreVideoPreview.defaultMuted = false;
+  adminStoreVideoPreview.muted = false;
+  adminStoreVideoPreview.volume = 1;
+  adminStoreVideoPreview.src = storeVideoObjectUrl;
+  adminStoreVideoPreview.hidden = false;
+  adminStoreVideoEmpty.hidden = true;
+  adminStoreVideoPreview.load();
+  adminStoreVideoStatus.textContent = 'Pratinjau video siap. Klik Simpan video untuk menerbitkannya.';
+  adminStoreVideoStatus.classList.remove('is-error');
 });
 
 async function saveAdminQrisImage(event) {
@@ -2590,10 +2814,10 @@ async function saveAdminQrisImage(event) {
       if (removeError) {
         adminQrisStatus.textContent = `QRIS tersimpan, tetapi gambar lama gagal dihapus: ${removeError.message}`;
       } else {
-        adminQrisStatus.textContent = 'QRIS baru berhasil disimpan di Supabase.';
+        adminQrisStatus.textContent = 'QRIS baru berhasil disimpan online.';
       }
     } else {
-      adminQrisStatus.textContent = 'QRIS berhasil disimpan di Supabase.';
+      adminQrisStatus.textContent = 'QRIS berhasil disimpan online.';
     }
     if (qrisImageObjectUrl) URL.revokeObjectURL(qrisImageObjectUrl);
     qrisImageObjectUrl = null;
@@ -2610,6 +2834,77 @@ async function saveAdminQrisImage(event) {
   } finally {
     adminQrisSaveButton.disabled = false;
     adminQrisSaveButton.textContent = 'Simpan QRIS';
+  }
+}
+
+async function saveAdminStoreVideo(event) {
+  event.preventDefault();
+  const [file] = adminStoreVideoInput.files;
+  if (!file) {
+    adminStoreVideoStatus.textContent = 'Pilih video terlebih dahulu.';
+    adminStoreVideoStatus.classList.add('is-error');
+    return;
+  }
+
+  adminStoreVideoSaveButton.disabled = true;
+  adminStoreVideoSaveButton.textContent = 'Menyimpan video...';
+  let uploadedPath = null;
+  let settingSaved = false;
+  try {
+    const extensionByType = {
+      'video/mp4': 'mp4',
+      'video/webm': 'webm'
+    };
+    const extension = extensionByType[file.type];
+    if (!extension || file.size > 50 * 1024 * 1024) {
+      throw new Error('Pilih video MP4 atau WebM berukuran maksimal 50 MB.');
+    }
+
+    uploadedPath = `store/video-${crypto.randomUUID()}.${extension}`;
+    const { error: uploadError } = await getSupabaseClient()
+      .storage.from(SUPABASE_STORE_VIDEO_BUCKET)
+      .upload(uploadedPath, file, { contentType: file.type, cacheControl: '3600', upsert: false });
+    if (uploadError) throw uploadError;
+
+    const { error: settingError } = await getSupabaseClient()
+      .from('store_settings')
+      .upsert({
+        key: 'store_video_path',
+        value: uploadedPath,
+        updated_at: new Date().toISOString()
+      });
+    if (settingError) throw settingError;
+    settingSaved = true;
+
+    const oldPath = savedStoreVideoPath;
+    savedStoreVideoPath = uploadedPath;
+    showStoreVideo(savedStoreVideoPath);
+    if (oldPath && oldPath !== uploadedPath) {
+      const { error: removeError } = await getSupabaseClient()
+        .storage.from(SUPABASE_STORE_VIDEO_BUCKET).remove([oldPath]);
+      if (removeError) {
+        adminStoreVideoStatus.textContent = `Video baru tersimpan, tetapi video lama gagal dihapus: ${removeError.message}`;
+      } else {
+        adminStoreVideoStatus.textContent = 'Video baru berhasil disimpan online.';
+      }
+    } else {
+      adminStoreVideoStatus.textContent = 'Video berhasil disimpan online.';
+    }
+    if (storeVideoObjectUrl) URL.revokeObjectURL(storeVideoObjectUrl);
+    storeVideoObjectUrl = null;
+    adminStoreVideoForm.reset();
+    showNotice('Video toko berhasil diperbarui.');
+  } catch (error) {
+    adminStoreVideoStatus.textContent = `Video toko gagal disimpan: ${error.message}`;
+    adminStoreVideoStatus.classList.add('is-error');
+    if (!settingSaved && uploadedPath) {
+      const { error: cleanupError } = await getSupabaseClient()
+        .storage.from(SUPABASE_STORE_VIDEO_BUCKET).remove([uploadedPath]);
+      if (cleanupError) console.error('Gagal membersihkan video yang tidak tersimpan:', cleanupError);
+    }
+  } finally {
+    adminStoreVideoSaveButton.disabled = false;
+    adminStoreVideoSaveButton.textContent = 'Simpan video';
   }
 }
 
@@ -2693,7 +2988,7 @@ adminLoginForm.addEventListener('submit', async (event) => {
     if (error) throw error;
     if (!data.user || !await isSupabaseAdmin(data.user)) {
       await client.auth.signOut();
-      throw new Error('Akun ini belum diberi akses admin. Tambahkan User ID akun ke tabel public.admin_users di Supabase.');
+      throw new Error('Akun ini belum diberi akses admin. Tambahkan User ID akun ke tabel admin_users.');
     }
     adminPreviewAuthenticated = true;
     adminLoginDialog.close();
@@ -2755,6 +3050,10 @@ document.querySelectorAll('[data-admin-form]').forEach((form) => {
   }
   if (form === adminQrisForm) {
     form.addEventListener('submit', saveAdminQrisImage);
+    return;
+  }
+  if (form === adminStoreVideoForm) {
+    form.addEventListener('submit', saveAdminStoreVideo);
     return;
   }
   form.addEventListener('submit', (event) => {
@@ -2950,6 +3249,7 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (searchModal.classList.contains('is-open')) setSearch(false);
     if (document.body.classList.contains('menu-open')) setMobileMenu(false);
+    if (adminStoreVideoPanel.classList.contains('is-open')) setAdminStoreVideoPanel(false);
     if (adminQrisPanel.classList.contains('is-open')) setAdminQrisPanel(false);
     if (adminPanel.classList.contains('is-open')) setAdminPanel(false);
       closeActionPopovers();
