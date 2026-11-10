@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10110e">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2310110e'/%3E%3Ctext x='32' y='47' text-anchor='middle' font-family='Arial' font-size='48' font-weight='900' fill='%23f04438'%3ER%3C/text%3E%3C/svg%3E">
+  <title>REDX STORE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+</head>
+<body class="min-h-screen text-white antialiased">
+  <header class="site-header fixed inset-x-0 top-4 z-50 px-4 sm:px-6">
+    <div id="navbar" class="nav-shell relative mx-auto flex max-w-7xl items-center justify-between rounded-2xl border border-white/10 bg-black/40 px-4 py-3 shadow-2xl shadow-black/20 backdrop-blur-xl transition-all duration-300 sm:px-6">
+      <div class="brand-clock-group">
+        <a class="brand-mark shrink-0" href="#home" aria-label="REDX Store, beranda">
+          <img class="brand-emblem" src="assets/images/image.png" alt="" width="76" height="76">
+          <span class="brand-copy">
+            <strong><span>RED</span><i>X</i></strong>
+            <small><i class="brand-rule" aria-hidden="true"></i>STORE<i class="brand-rule" aria-hidden="true"></i></small>
+          </span>
+        </a>
+        <div class="header-clock-item nav-clock-item" aria-label="Waktu saat ini">
+          <span class="header-clock-label">JAM</span>
+          <time id="current-time" class="header-clock-value">--:--:--</time>
+        </div>
+      </div>
+
+      <nav id="desktop-nav" class="desktop-nav relative hidden items-center gap-1 lg:flex" aria-label="Navigasi utama">
+        <span id="nav-indicator" class="nav-indicator" aria-hidden="true"></span>
+        <a class="nav-link is-current" href="#home">Home</a>
+        <a class="nav-link" href="#new-drops">New Drops <span class="nav-badge">NEW</span></a>
+        <div class="catalog-wrap">
+          <button class="nav-link catalog-toggle" type="button" aria-expanded="false" aria-haspopup="true">
+            Catalog <span class="emoji-icon nav-chevron" aria-hidden="true">⬇️</span>
+          </button>
+        </div>
+        <a class="nav-link" href="#size-guide">Size Guide</a>
+        <a class="nav-link" href="#about">About Us</a>
+      </nav>
+
+      <div id="catalog-menu" class="catalog-menu" aria-label="Kategori produk" aria-hidden="true" inert>
+        <a href="#tees">T-Shirts <span>01</span></a>
+        <a href="#oversized">Oversized Tees <span>02</span></a>
+        <a href="#graphics">Graphic Tees <span>03</span></a>
+        <a href="#hoodies">Hoodies <span>04</span></a>
+      </div>
+
+      <div class="nav-actions flex items-center gap-1 sm:gap-2">
+        <button id="wishlist-open" class="icon-button wishlist-button" type="button" aria-label="Wishlist, 0 item" title="Wishlist">
+          <span class="emoji-icon" aria-hidden="true">🤍</span>
+          <span id="wishlist-count" class="count-badge" hidden>0</span>
+        </button>
+        <div class="popover-anchor">
+          <button id="cart-open" class="cart-button" type="button" aria-label="Keranjang kosong, total Rp 0" aria-expanded="false" aria-controls="cart-popover" title="Keranjang belanja" disabled>
+            <span class="cart-icon-wrap"><span class="whatsapp-cart-icon" aria-hidden="true"><span class="emoji-icon">🛒</span></span><span id="cart-count" class="count-badge cart-count-badge" hidden>0</span></span>
+            <span class="cart-meta"><small id="cart-item-count">0 ITEM</small><strong id="cart-total">Rp 0</strong></span>
+          </button>
+          <div id="cart-popover" class="action-popover cart-popover" hidden>
+            <div class="popover-heading"><span>KERANJANG</span><span id="cart-popover-count">0 ITEM</span></div>
+            <div id="cart-items" class="cart-items"><p class="cart-empty">Keranjang masih kosong.</p></div>
+            <div class="cart-popover-total"><span>Total</span><strong id="cart-popover-total">Rp 0</strong></div>
+            <button id="checkout-button" class="popover-cta" type="button" disabled>Lanjut checkout <span class="emoji-icon" aria-hidden="true">➡️</span></button>
+          </div>
+        </div>
+        <button id="admin-open" class="admin-login-trigger" type="button" title="Login Admin">
+          <span class="emoji-icon" aria-hidden="true">🔐</span>
+          <span class="admin-login-trigger-label">Login Admin</span>
+        </button>
+        <a class="shop-button hidden sm:inline-flex" href="#new-drops"><span>Shop Collection</span><span class="emoji-icon" aria-hidden="true">↗️</span></a>
+        <button id="menu-open" class="icon-button menu-button lg:hidden" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="emoji-icon menu-open-icon" aria-hidden="true">🧭</span>
+          <span class="emoji-icon menu-close-icon" aria-hidden="true">✖️</span>
+        </button>
+      </div>
+    </div>
+    <div class="header-clock-bar mx-auto flex max-w-7xl items-center justify-between" aria-label="Waktu dan tanggal saat ini">
+      <div class="header-clock-item header-date-item">
+        <span class="header-clock-label">TANGGAL</span>
+        <time id="current-date" class="header-clock-value">Memuat tanggal...</time>
+      </div>
+    </div>
+  </header>
+
+  <div id="mobile-backdrop" class="mobile-backdrop" aria-hidden="true"></div>
+  <aside id="mobile-menu" class="mobile-menu" aria-label="Menu mobile" aria-hidden="true" inert>
+    <div class="mobile-menu-head">
+      <span class="mobile-menu-label">RDX / NAVIGATION</span>
+      <span class="mobile-menu-label">01—05</span>
+    </div>
+    <nav class="mobile-links" aria-label="Navigasi mobile">
+      <a href="#home"><span>01</span>Home</a>
+      <a href="#new-drops"><span>02</span>New Drops <span class="nav-badge">NEW</span></a>
+      <button class="mobile-catalog-toggle" type="button" aria-expanded="false"><span><i>03</i>Catalog</span><span class="emoji-icon" aria-hidden="true">➕</span></button>
+      <div class="mobile-catalog-items" aria-hidden="true" inert>
+        <div class="mobile-catalog-items-inner">
+          <a href="#tees">T-Shirts</a><a href="#oversized">Oversized Tees</a><a href="#graphics">Graphic Tees</a><a href="#hoodies">Hoodies</a>
+        </div>
+      </div>
+      <a href="#size-guide"><span>04</span>Size Guide</a>
+      <a href="#about"><span>05</span>About Us</a>
+    </nav>
+    <a class="shop-button mobile-shop-button" href="#new-drops"><span>Shop Collection</span><span class="emoji-icon" aria-hidden="true">↗️</span></a>
+    <p class="mobile-menu-foot">MADE FOR THE ONES WHO MOVE DIFFERENT.</p>
+  </aside>
+
+  <main id="home">
+    <section class="hero relative isolate flex min-h-[760px] items-center overflow-hidden px-5 pb-20 pt-32 sm:px-8 lg:min-h-[850px]" aria-labelledby="hero-title">
+      <div class="hero-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+      <div class="hero-glow absolute -right-32 top-28 -z-10 h-96 w-96 rounded-full" aria-hidden="true"></div>
+      <div class="mx-auto grid w-full max-w-7xl items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-4">
+        <div class="hero-copy relative z-10 max-w-2xl">
+          <p class="eyebrow mb-5 flex items-center gap-3"><span class="eyebrow-line"></span> DROP 04 / 2026 <span class="eyebrow-dot"></span> JAKARTA, ID</p>
+          <h1 id="hero-title" class="hero-title font-black uppercase">Bukan<br>seragam<br><span>Ini sikap</span></h1>
+          <p class="mt-7 max-w-md text-sm leading-7 text-white/60 sm:text-base">READY STOCK Tampil Serasi, Nyaman Setiap Hari,Koleksi kaos premium unisex terbaik untuk kamu dan pasangan. Bahan adem, desain timeless, cocok untuk cowok dan cewek, Bergaransi 100%!</p>
+          <div class="mt-8 flex flex-wrap items-center gap-5">
+            <a class="hero-cta" href="#new-drops"><span>Explore the drop</span><span class="emoji-icon" aria-hidden="true">➡️</span></a>
+            <a class="text-link" href="#about">Our point of view <span class="emoji-icon" aria-hidden="true">↗️</span></a>
+          </div>
+          <div class="hero-meta mt-12 flex items-center gap-4">
+            <div class="avatar-stack" aria-hidden="true"><span>R</span><span>D</span><span>X</span></div>
+            <p><strong>Built outside the lines.</strong><br><span>Independent streetwear, since 2019</span></p>
+          </div>
+        </div>
+
+        <div class="hero-visual relative mx-auto w-full max-w-[470px] lg:ml-auto">
+          <div class="visual-frame relative aspect-[0.67] overflow-hidden rounded-[2px]">
+            <img class="hero-image h-full w-full object-cover" src="assets/images/8a0d4f6d-50d2-45c0-a279-2ab98bc432d0.jpg" alt="Model memakai kaus hitam dan celana cargo putih" fetchpriority="high">
+            <div class="image-shade absolute inset-0" aria-hidden="true"></div>
+            <span class="image-stamp">RDX<br>STUDIO<br>026</span>
+            <span class="image-caption">UNIFORM FOR<br>THE UNFILTERED</span>
+          </div>
+          <div class="drop-tag"><span class="drop-tag-index">04</span><span>THE<br>AFTERHOURS<br>DROP</span><span class="emoji-icon" aria-hidden="true">↗️</span></div>
+          <div class="visual-note"><span class="emoji-icon" aria-hidden="true">🔴</span> LIMITED RUN <span class="visual-note-divider"></span> 120 PIECES</div>
+        </div>
+      </div>
+      <a class="scroll-cue" href="#new-drops"><span>SCROLL TO EXPLORE</span><span class="scroll-line"></span></a>
+    </section>
+
+    <section id="new-drops" class="drop-strip" aria-label="Informasi drop terbaru">
+      <div class="drop-strip-inner"><span>NEW DROP LIVE</span><i></i><strong>AFTERHOURS / 04</strong><i></i><span>BUILT FOR THE BOLD</span><i></i><strong>AFTERHOURS / 04</strong><i></i><span>NEW DROP LIVE</span></div>
+    </section>
+
+    <div class="product-search-wrap">
+      <form id="nav-search" class="nav-search hero-search" role="search">
+        <span class="emoji-icon" aria-hidden="true">🔍</span>
+        <input id="nav-search-input" type="search" placeholder="Cari produk, info, FAQ, atau lainnya..." aria-label="Cari produk dan seluruh halaman" aria-controls="product-search-suggestions" aria-expanded="false" autocomplete="off">
+        <button type="submit" aria-label="Jalankan pencarian"><span class="emoji-icon" aria-hidden="true">➡️</span></button>
+      </form>
+      <div id="product-search-suggestions" class="product-search-suggestions" role="listbox" aria-label="Saran produk" hidden></div>
+    </div>
+
+    <section id="tees" class="product-section mx-auto max-w-7xl px-5 py-20 sm:px-8" aria-labelledby="featured-title">
+      <header class="product-section-header">
+        <div>
+          <p class="eyebrow product-kicker">RDX / SELECTED FOR YOU</p>
+          <h2 id="featured-title" class="product-section-title">FEATURED <span>DROPS</span></h2>
+        </div>
+        <p class="product-section-note">Limited pieces. No repeats.</p>
+      </header>
+      <div class="product-toolbar">
+        <p class="product-result-count"><span id="product-result-count">0 / 20</span> PRODUCTS</p>
+        <div class="product-filters" role="group" aria-label="Filter kategori produk">
+          <button class="product-filter is-active" type="button" data-product-filter="all" aria-pressed="true">Semua</button>
+          <button class="product-filter" type="button" data-product-filter="oversized" aria-pressed="false">Oversized</button>
+          <button class="product-filter" type="button" data-product-filter="graphic" aria-pressed="false">Graphic Tees</button>
+          <button class="product-filter" type="button" data-product-filter="basic" aria-pressed="false">Basic</button>
+        </div>
+      </div>
+      <div id="product-grid" class="product-grid" aria-live="polite"></div>
+      <p id="product-empty" class="product-empty" hidden>Tidak ada produk di kategori ini.</p>
+    </section>
+
+    <section class="collection-hero mx-auto max-w-7xl px-5 sm:px-8" aria-labelledby="collection-hero-title">
+      <div class="collection-hero-panel">
+        <div class="collection-hero-copy">
+          <p class="eyebrow collection-hero-kicker"><span class="eyebrow-line"></span> RDX / AFTERHOURS 04</p>
+          <h2 id="collection-hero-title" class="collection-hero-title">TEMUKAN<br><span>VERSI KAMU.</span></h2>
+          <p class="collection-hero-description"> </p>
+          <a class="hero-cta collection-hero-cta" href="#tees"><span>Jelajahi koleksi</span><span class="emoji-icon" aria-hidden="true">➡️</span></a>
+        </div>
+        <div class="collection-hero-art">
+          <img class="collection-hero-image" src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="Model mengenakan outfit streetwear" loading="lazy">
+          <span class="collection-hero-art-label">LIMITED<br>COLLECTION</span>
+          <span class="collection-hero-art-mark">RDX / 026</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="social-strip" aria-label="Media sosial RDX Store">
+      <div class="social-strip-inner">
+        <h3 class="social-strip-label">IKUTI KAMI DI MEDIA SOSIAL</h3>
+        <div class="social-links">
+          <a class="social-link social-instagram" href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Buka Instagram">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle class="social-icon-dot" cx="18" cy="6" r="1"></circle></svg>
+            <span>Instagram</span>
+          </a>
+          <a class="social-link social-tiktok" href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="Buka TikTok">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3v11.2a4.2 4.2 0 1 1-3.6-4.15"></path><path d="M15 3c.4 2.6 2 4.3 4.5 4.8"></path></svg>
+            <span>TikTok</span>
+          </a>
+          <a class="social-link social-whatsapp" href="https://wa.me/62895326582488" target="_blank" rel="noopener noreferrer" aria-label="Hubungi admin melalui WhatsApp">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 11.7a8.2 8.2 0 0 1-12.1 7.2L3 20l1.2-4.8a8.2 8.2 0 1 1 16-3.5Z"></path><path d="M8.2 7.8c.3-.5.6-.5.9-.5h.4c.2 0 .4.1.5.4l.7 1.7c.1.2.1.4 0 .6l-.5.7c-.2.2-.2.4 0 .6a7 7 0 0 0 2.6 2.3c.2.1.4.1.6-.1l.8-.9c.2-.2.4-.2.7-.1l1.6.8c.3.1.4.3.4.5 0 .3-.2 1.2-.7 1.6-.5.5-1.2.7-2 .6-1.1-.2-2.4-.8-3.8-2-1.6-1.4-2.6-3.1-2.9-4.2-.3-1 .1-1.7.7-2Z"></path></svg>
+            <span>WhatsApp</span>
+          </a>
+          <a class="social-link social-facebook" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Buka Facebook">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1v-2c0-.9.3-1.5 1.6-1.5h1.7V3.6c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.2v2.2H7.7V13h2.7v8h3.1Z"></path></svg>
+            <span>Facebook</span>
+          </a>
+          <a class="social-link social-discord" href="https://discord.com/" target="_blank" rel="noopener noreferrer" aria-label="Buka Discord">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.7 5.2a18 18 0 0 0-4.4-1.4l-.6 1.2a16.5 16.5 0 0 0-5.4 0l-.6-1.2a18 18 0 0 0-4.4 1.4C1.5 9.3.8 13.3 1.2 17.2a18 18 0 0 0 5.4 2.7l1.2-1.9-1.8-.9.4-.3a12.8 12.8 0 0 0 11.2 0l.4.3-1.8.9 1.2 1.9a18 18 0 0 0 5.4-2.7c.5-4.5-.8-8.5-3.1-12Zm-11.2 9.7c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Zm7 0c-1.1 0-2-1-2-2.2s.9-2.2 2-2.2 2 1 2 2.2-.9 2.2-2 2.2Z"></path></svg>
+            <span>Discord</span>
+          </a>
+        </div>
+        <a class="store-location" href="https://maps.app.goo.gl/jZLKvZemrjcC1UEq9" target="_blank" rel="noopener noreferrer" aria-label="Buka lokasi toko di Google Maps">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+          <span>LOKASI TOKO</span>
+        </a>
+        <div class="store-map">
+          <iframe
+            src="https://maps.google.com/maps?q=-7.5922901%2C110.8054122&output=embed"
+            title="Peta lokasi toko Boedyfivers Home"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </section>
+
+    <div class="store-info-layout">
+      <section class="store-faq" aria-labelledby="store-faq-title">
+      <div class="store-faq-inner">
+        <p class="eyebrow store-faq-kicker">RDX / INFO</p>
+        <h2 id="store-faq-title" class="store-faq-title">FAQ <span>STORE</span></h2>
+        <div class="store-faq-list">
+          <details class="store-faq-item">
+            <summary>Di mana lokasi toko RDX?</summary>
+            <p>Toko berada di Boedyfivers Home. Buka <a href="https://maps.app.goo.gl/jZLKvZemrjcC1UEq9" target="_blank" rel="noopener noreferrer">lokasi di Google Maps</a> untuk melihat peta dan petunjuk arah.</p>
+          </details>
+          <details class="store-faq-item">
+            <summary>Bagaimana memilih ukuran produk?</summary>
+            <p>Pilih ukuran yang tersedia pada kartu produk sebelum menambahkan item ke keranjang.</p>
+          </details>
+          <details class="store-faq-item">
+            <summary>Bagaimana cara memesan?</summary>
+            <p>Pilih produk dan variannya, lalu tambahkan ke keranjang. Fitur checkout dan konfirmasi pesanan belum tersedia pada mode tes.</p>
+          </details>
+          <details class="store-faq-item">
+            <summary>Bagaimana pembayaran dikonfirmasi?</summary>
+            <p>Bayar dengan QRIS statis dan masukkan total pesanan secara manual. Pembayaran akan diverifikasi admin; website tidak menerima konfirmasi otomatis.</p>
+          </details>
+        </div>
+      </div>
+      </section>
+
+      <section class="feedback-panel" aria-labelledby="feedback-title">
+        <div class="feedback-stars" aria-hidden="true">
+          <span class="feedback-star feedback-star-one">✦</span>
+          <span class="feedback-star feedback-star-two">✧</span>
+          <span class="feedback-star feedback-star-three">✦</span>
+          <span class="feedback-star feedback-star-four">✧</span>
+          <span class="feedback-star feedback-star-five">✦</span>
+        </div>
+        <p class="eyebrow feedback-kicker">SUARA KAMU / RDX</p>
+        <h2 id="feedback-title" class="store-faq-title">KRITIK <span>&amp; SARAN</span></h2>
+        <label class="feedback-label" for="feedback-name">Nama</label>
+        <input id="feedback-name" class="feedback-input feedback-name-input" type="text" placeholder="Masukkan nama kamu" autocomplete="name" maxlength="100" required>
+        <label class="feedback-label" for="feedback-message">Komentar</label>
+        <textarea id="feedback-message" class="feedback-input" rows="5" placeholder="Tulis kritik atau saran kamu di sini..." minlength="3" maxlength="2000" required></textarea>
+        <p class="feedback-note" role="status" aria-live="polite">Kritik dan saran akan disimpan secara permanen.</p>
+        <button id="feedback-submit" class="feedback-submit" type="button">KIRIM SARAN <span aria-hidden="true">↗</span></button>
+      </section>
+    </div>
+
+    <section id="about" class="below-fold mx-auto grid max-w-7xl gap-6 px-5 py-20 sm:px-8 md:grid-cols-[1fr_auto] md:items-end">
+      <div><p class="eyebrow mb-4">NO RULES. JUST YOURS.</p><h2 class="section-title">Wear your<br><span>own frequency.</span></h2></div>
+      <p class="max-w-sm text-sm leading-7 text-white/55">Siluet longgar dan detail yang dirancang untuk pemakaian harian. Dibuat terbatas, dipakai sesukamu.</p>
+    </section>
+
+    <section class="store-contact" aria-labelledby="store-contact-title">
+        <p class="eyebrow store-faq-kicker">RDX / CONTACT</p>
+        <div class="store-contact-heading">
+          <h2 id="store-contact-title" class="store-faq-title">HUBUNGI <span>KAMI</span></h2>
+          <a class="store-terms-link" href="terms.html">SYARAT &amp; KETENTUAN <span aria-hidden="true">↗</span></a>
+        </div>
+      <div class="contact-methods">
+        <a class="contact-method" href="https://wa.me/6285183009090" target="_blank" rel="noopener noreferrer" aria-label="Hubungi kami melalui WhatsApp">
+          <span class="contact-method-icon contact-whatsapp-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <path d="M16 3.2A12.6 12.6 0 0 0 5.2 22.3L3.5 28.5l6.4-1.7A12.6 12.6 0 1 0 16 3.2Z"></path>
+              <path class="whatsapp-phone" d="M12.1 10.1c.3-.6.7-.6 1-.6h.6c.3 0 .5.1.7.5l1 2.3c.1.3.1.5-.1.8l-.8 1c-.2.2-.2.5 0 .8.8 1.3 1.9 2.4 3.3 3.1.3.2.6.1.8-.1l1.1-1.3c.2-.3.5-.3.8-.2l2.2 1c.3.2.5.3.5.6 0 .4-.2 1.6-1 2.2-.7.7-1.8 1-3 .7-1.5-.3-3.4-1.2-5.3-2.9-2-1.8-3.3-4-3.7-5.6-.4-1.4.1-2.5.8-3.3.4-.5.8-.7 1.1-.7Z"></path>
+            </svg>
+          </span>
+          <span class="contact-method-copy"><strong>WHATSAPP</strong><small>Klik untuk chat melalui WhatsApp</small></span>
+        </a>
+        <a class="contact-method" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=boedyfivers%40gmail.com&amp;su=Pesan%20dari%20REDX%20Store" target="_blank" rel="noopener noreferrer" aria-label="Tulis email melalui Gmail ke boedyfivers@gmail.com">
+          <span class="contact-method-icon contact-email-icon" aria-hidden="true">
+            <svg viewBox="0 0 32 32" focusable="false">
+              <rect x="3" y="6" width="26" height="20" rx="4"></rect>
+              <path d="m5 9 11 9L27 9"></path>
+            </svg>
+          </span>
+          <span class="contact-method-copy"><strong>EMAIL</strong><small>Kirim email ke boedyfivers@gmail.com</small></span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer-inner">
+      <img class="footer-banner footer-banner-left" src="assets/images/fff.jpg" alt="" width="368" height="136" loading="lazy">
+      <div class="footer-message">
+        <p class="footer-eyebrow">RDX STORE</p>
+        <h2 class="footer-thanks" aria-label="TERIMA KASIH ATAS KUNJUNGANNYA">
+          <span class="footer-thanks-text" aria-hidden="true">
+            <span class="footer-thanks-line"><span>TERIMA KASIH ATAS</span></span>
+            <span class="footer-thanks-line"><span>KUNJUNGANNYA</span></span>
+          </span>
+        </h2>
+        <nav class="footer-links" aria-label="Informasi toko">
+          <a href="terms.html">Syarat &amp; Ketentuan</a>
+          <a href="index.html">Kembali ke toko</a>
+        </nav>
+        <p class="footer-copyright">© 2026 RDX STORE</p>
+      </div>
+    </div>
+  </footer>
+
+  <section id="admin-panel" class="admin-panel" aria-hidden="true" inert>
+    <button class="admin-scrim" type="button" data-admin-close aria-label="Tutup panel admin"></button>
+    <div class="admin-shell" role="dialog" aria-modal="true" aria-labelledby="admin-title">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow admin-kicker">RDX / OPERATIONS</p>
+          <h2 id="admin-title" class="admin-title">Panel Admin</h2>
+          <p class="admin-local-note"><span class="admin-status-dot"></span>SUPABASE · PRODUK TERSIMPAN PERMANEN</p>
+        </div>
+        <div class="admin-header-actions">
+          <button id="admin-qris-open" class="admin-logout-button admin-qris-open-button" type="button">QRIS</button>
+          <button id="admin-logout" class="admin-logout-button" type="button">Keluar Admin</button>
+          <button class="icon-button" type="button" data-admin-close aria-label="Tutup panel admin"><span class="emoji-icon" aria-hidden="true">✖️</span></button>
+        </div>
+      </header>
+
+      <div class="admin-tabs" role="tablist" aria-label="Modul admin">
+        <button class="admin-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="admin-products-view" data-admin-tab="products">Produk</button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-categories-view" data-admin-tab="categories">Kategori</button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-orders-view" data-admin-tab="orders">Pesanan Masuk</button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-stock-view" data-admin-tab="stock">Barang Masuk</button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-ledger-view" data-admin-tab="ledger">Pembukuan</button>
+        <button class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="admin-settings-view" data-admin-tab="settings">Koneksi</button>
+      </div>
+
+      <div id="admin-orders-view" class="admin-view" role="tabpanel" hidden>
+        <div class="admin-view-heading"><div><p class="admin-eyebrow">WEBSITE CHECKOUT</p><h3>Pesanan masuk</h3></div><span class="admin-draft-badge">SUPABASE</span></div>
+        <p class="admin-orders-note">Pesanan disimpan permanen di Supabase saat tautan WhatsApp diklik. Website tidak dapat memastikan pesan benar-benar terkirim.</p>
+        <div id="admin-order-list" class="admin-order-list"></div>
+        <div id="admin-orders-empty" class="admin-empty-state"><span class="emoji-icon" aria-hidden="true">📦</span><strong>Belum ada pesanan</strong><p>Pesanan checkout akan muncul di sini setelah tersimpan.</p></div>
+      </div>
+
+      <div id="admin-products-view" class="admin-view" role="tabpanel">
+        <div class="admin-view-heading"><div><p class="admin-eyebrow">CATALOG MANAGEMENT</p><h3>Tambah &amp; edit produk</h3></div><span class="admin-draft-badge">SUPABASE</span></div>
+        <form class="admin-form" data-admin-form="product">
+          <label>Nama produk<input name="name" type="text" required placeholder="Contoh: Afterhours Oversized Tee"></label>
+          <div class="admin-form-row"><label>Kategori<select name="category" id="admin-product-category" required><option value="">Pilih kategori</option></select></label><label>Harga (Rp)<input name="price" type="number" min="0" step="1" required placeholder="0"></label></div>
+          <fieldset class="admin-option-fieldset">
+            <legend>Ukuran tersedia</legend>
+            <div class="admin-choice-list">
+              <label><input type="checkbox" name="sizes" value="S" checked><span>S</span></label>
+              <label><input type="checkbox" name="sizes" value="M" checked><span>M</span></label>
+              <label><input type="checkbox" name="sizes" value="L" checked><span>L</span></label>
+              <label><input type="checkbox" name="sizes" value="XL" checked><span>XL</span></label>
+            </div>
+          </fieldset>
+          <label>Upload beberapa gambar dari perangkat<input id="admin-product-images" name="images" type="file" accept="image/*" multiple required><small>Pilih beberapa sekaligus atau pilih lagi untuk menambahkan gambar. Maksimal 10 gambar per produk, masing-masing 5 MB.</small></label>
+          <div id="admin-product-image-previews" class="admin-image-previews" aria-live="polite"></div>
+          <p id="admin-product-image-status" class="admin-form-note" role="status">Gambar diupload ke Supabase Storage saat produk disimpan.</p>
+          <label for="admin-product-size-chart">Size chart untuk produk ini (opsional)<input id="admin-product-size-chart" name="sizeChart" type="file" accept="image/jpeg,image/png,image/webp"><small>Pilih gambar size chart yang cocok untuk produk ini. Maksimal 5 MB.</small></label>
+          <div class="admin-product-size-chart-preview" hidden>
+            <img id="admin-product-size-chart-preview" alt="Pratinjau size chart produk">
+            <button id="admin-product-size-chart-remove" class="admin-catalog-action is-danger" type="button" hidden>Hapus size chart dari produk</button>
+          </div>
+          <p id="admin-product-size-chart-status" class="admin-form-note" role="status">Belum ada size chart khusus untuk produk ini.</p>
+          <fieldset class="admin-option-fieldset">
+            <legend>Warna tersedia</legend>
+            <div class="admin-choice-list admin-color-choices">
+              <label><input type="checkbox" name="colors" value="black"><span>Black</span></label>
+              <label><input type="checkbox" name="colors" value="bone"><span>White</span></label>
+              <label><input type="checkbox" name="colors" value="red"><span>Red</span></label>
+              <label><input type="checkbox" name="colors" value="olive"><span>Olive</span></label>
+              <label><input type="checkbox" name="colors" value="blue"><span>Blue</span></label>
+            </div>
+          </fieldset>
+          <fieldset class="admin-option-fieldset">
+            <legend>Stok per warna</legend>
+            <div id="admin-product-color-stock-fields" class="admin-color-stock-fields"></div>
+            <small>Warna di luar daftar dibuat otomatis dari warna dominan foto. Foto dengan warna sama memakai satu kolom stok; isi jumlah hanya untuk warna yang ingin dibatasi.</small>
+          </fieldset>
+          <label>Deskripsi<textarea name="description" rows="3" placeholder="Deskripsi produk"></textarea></label>
+          <button class="admin-submit" type="submit">Simpan Permanen</button>
+          <button id="admin-product-preview" class="admin-catalog-action" type="button" hidden>Lihat pratinjau produk</button>
+          <button id="admin-product-cancel-edit" class="admin-catalog-action" type="button" hidden>Batal edit</button>
+          <p id="admin-product-save-note" class="admin-form-note">Produk dan gambar disimpan di Supabase.</p>
+        </form>
+        <div class="admin-catalog-list-heading"><h3>Produk saat ini</h3><span class="admin-draft-badge">SUPABASE</span></div>
+        <div id="admin-product-list" class="admin-catalog-list"></div>
+      </div>
+
+      <div id="admin-categories-view" class="admin-view" role="tabpanel" hidden>
+        <div class="admin-view-heading"><div><p class="admin-eyebrow">CATALOG STRUCTURE</p><h3>Kelola kategori</h3></div><span class="admin-draft-badge">MODE TES</span></div>
+        <form class="admin-form" data-admin-form="category">
+          <label>Nama kategori<input name="name" type="text" required placeholder="Contoh: Hoodie"></label>
+          <label>ID kategori<input name="slug" type="text" required pattern="[a-z0-9]+(?:-[a-z0-9]+)*" placeholder="Contoh: hoodie"></label>
+          <button class="admin-submit" type="submit">Tambah kategori</button>
+          <p id="admin-category-status" class="admin-form-note" role="status">Kategori tes disimpan lokal di browser ini.</p>
+        </form>
+        <div class="admin-catalog-list-heading"><h3>Kategori saat ini</h3><span class="admin-draft-badge">MODE TES</span></div>
+        <div id="admin-category-list" class="admin-catalog-list"></div>
+      </div>
+
+      <div id="admin-stock-view" class="admin-view" role="tabpanel" hidden>
+        <div class="admin-view-heading"><div><p class="admin-eyebrow">INVENTORY</p><h3>Penerimaan barang</h3></div><span class="admin-draft-badge">BELUM AKTIF</span></div>
+        <form class="admin-form" data-admin-form="stock">
+          <label>Nama produk<input name="product" type="text" placeholder="Contoh: Afterhours Oversized Tee"></label>
+          <label>SKU / varian<input name="sku" type="text" placeholder="RDX-TEE-BLK-M"></label>
+          <div class="admin-form-row"><label>Jumlah diterima<input name="quantity" type="number" min="1" placeholder="0"></label><label>Modal per unit (Rp)<input name="unitCost" type="number" min="0" placeholder="0"></label></div>
+          <label>Supplier / catatan<input name="supplier" type="text" placeholder="Nama supplier atau nomor nota"></label>
+          <button class="admin-submit" type="submit" disabled>Catat barang masuk <span class="emoji-icon" aria-hidden="true">↗️</span></button>
+          <p class="admin-form-note">Form ini belum aktif pada mode tes.</p>
+        </form>
+      </div>
+
+      <div id="admin-ledger-view" class="admin-view" role="tabpanel" hidden>
+        <div class="admin-view-heading"><div><p class="admin-eyebrow">FINANCE</p><h3>Pembukuan &amp; profit</h3></div><span class="admin-draft-badge">BELUM AKTIF</span></div>
+        <form class="admin-form admin-capital-form" data-admin-form="capital">
+          <label>Modal awal (Rp)<input name="openingCapital" type="number" min="0" placeholder="Atur modal awal"></label>
+          <button class="admin-submit" type="submit" disabled>Simpan modal awal</button>
+          <p class="admin-form-note">Pengaturan modal belum aktif pada mode tes.</p>
+        </form>
+        <div class="ledger-columns"><span>TANGGAL</span><span>REFERENSI</span><span>PROFIT</span><span>STATUS</span></div>
+        <div class="admin-empty-state compact"><strong>Belum ada transaksi</strong><p>Profit dicatat setelah pembayaran dikonfirmasi lunas secara manual.</p></div>
+      </div>
+
+      <div id="admin-settings-view" class="admin-view" role="tabpanel" hidden>
+        <div class="admin-view-heading"><div><p class="admin-eyebrow">KONEKSI</p><h3>Koneksi pembayaran</h3></div><span class="admin-draft-badge">MANUAL</span></div>
+        <form class="admin-form" data-admin-form="connections">
+          <label>Alamat layanan<input name="apiUrl" type="url" placeholder="Belum digunakan pada mode tes" disabled></label>
+          <label>Mode pembayaran<select name="paymentMode"><option value="manual">Manual · konfirmasi admin</option><option value="gateway" disabled>Payment gateway · belum dikonfigurasi</option></select></label>
+          <div class="admin-secure-note"><span class="emoji-icon" aria-hidden="true">🔒</span><p>QRIS memakai konfirmasi manual. Koneksi dan payment gateway belum digunakan.</p></div>
+          <button class="admin-submit" type="submit" disabled>Simpan koneksi</button>
+          <p class="admin-form-note">Pengaturan koneksi dan payment gateway belum aktif.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section id="admin-qris-panel" class="admin-panel admin-qris-panel" aria-hidden="true" inert>
+    <button class="admin-scrim" type="button" data-admin-qris-close aria-label="Tutup panel QRIS"></button>
+    <div class="admin-shell admin-qris-shell" role="dialog" aria-modal="true" aria-labelledby="admin-qris-title">
+      <header class="admin-header">
+        <div>
+          <p class="eyebrow admin-kicker">RDX / PAYMENT</p>
+          <h2 id="admin-qris-title" class="admin-title">Pengaturan QRIS</h2>
+          <p class="admin-local-note"><span class="admin-status-dot"></span>QRIS STATIS · KONFIRMASI MANUAL</p>
+        </div>
+        <button class="icon-button" type="button" data-admin-qris-close aria-label="Tutup panel QRIS"><span class="emoji-icon" aria-hidden="true">✖️</span></button>
+      </header>
+      <form id="admin-qris-form" class="admin-form" data-admin-form="qris">
+        <p>Ganti gambar QRIS pembayaran. Gambar disimpan permanen di Supabase Storage; checkout menampilkan bagian kode QR saja.</p>
+        <div class="qris-image-frame admin-qris-preview">
+          <img id="admin-qris-preview-image" src="assets/images/qris-code.png" alt="Pratinjau kode QRIS">
+        </div>
+        <label for="admin-qris-image">Pilih gambar QRIS<input id="admin-qris-image" name="qrisImage" type="file" accept="image/jpeg,image/png,image/webp" required><small>Unggah gambar yang sudah berisi kode QR saja agar tidak terpotong. Maksimal 5 MB.</small></label>
+        <button id="admin-qris-save" class="admin-submit" type="submit">Simpan QRIS</button>
+        <p id="admin-qris-status" class="admin-form-note" role="status">QRIS bawaan sedang digunakan.</p>
+      </form>
+    </div>
+  </section>
+
+  <dialog id="admin-login-dialog" class="admin-login-dialog" aria-labelledby="admin-login-title">
+    <div class="admin-login-header">
+      <div>
+        <p class="eyebrow admin-kicker">RDX / ACCESS</p>
+        <h2 id="admin-login-title" class="admin-title">Login Admin</h2>
+      </div>
+      <button id="admin-login-close" class="icon-button" type="button" aria-label="Tutup login"><span class="emoji-icon" aria-hidden="true">✖️</span></button>
+    </div>
+    <form id="admin-login-form" class="admin-login-form">
+      <label for="admin-login-email">Email admin</label>
+      <input id="admin-login-email" name="email" type="email" autocomplete="username" required>
+      <label for="admin-login-password">Kata sandi</label>
+      <div class="admin-password-field">
+        <input id="admin-login-password" name="password" type="password" autocomplete="current-password" required>
+        <button id="admin-login-password-toggle" class="admin-password-toggle" type="button" aria-label="Tampilkan kata sandi" aria-pressed="false">
+          <svg class="admin-password-eye" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+          <svg class="admin-password-eye-off" view(Box="0 0 24 24" fill="none" aria-hidden="true"><path d="m3 3 18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.9 5.2A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a14.8 14.8 0 0 1-3.1 3.8M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7a10.7 10.7 0 0 0 4-.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <p id="admin-login-error" class="admin-login-error" role="alert" hidden></p>
+      <button id="admin-login-submit" class="admin-submit admin-login-submit" type="submit">Masuk</button>
+      <p class="admin-login-note"><span class="emoji-icon" aria-hidden="true">🔒</span><span>Masuk dengan email akun admin Supabase.</span></p>
+    </form>
+  </dialog>
+
+  <div id="search-modal" class="search-modal" aria-hidden="true" inert>
+    <button class="search-scrim" type="button" data-search-close aria-label="Tutup pencarian"></button>
+    <section class="search-dialog" role="dialog" aria-modal="true" aria-labelledby="search-title">
+      <div class="search-dialog-head"><p id="search-title" class="eyebrow">CARI DI SELURUH HALAMAN</p><button class="icon-button" type="button" data-search-close aria-label="Tutup pencarian"><span class="emoji-icon" aria-hidden="true">✖️</span></button></div>
+      <label class="search-field"><span class="emoji-icon" aria-hidden="true">🔍</span><input id="product-search" type="search" placeholder="Cari produk, info, FAQ, atau lainnya..." autocomplete="off"><kbd>ESC</kbd></label>
+      <div class="search-suggestions"><span>POPULAR</span><button type="button" data-query="oversized">Oversized</button><button type="button" data-query="graphic">Graphic tee</button><button type="button" data-query="hoodie">Hoodie</button></div>
+      <p id="search-status" class="search-status" aria-live="polite">Cari produk, informasi halaman, FAQ, kritik &amp; saran, hingga footer.</p>
+      <div id="search-results" class="search-results" aria-label="Hasil pencarian seluruh halaman"></div>
+    </section>
+  </div>
+
+  <dialog id="product-detail-dialog" class="product-detail-dialog" aria-labelledby="product-detail-title">
+    <div class="product-detail-dialog-head">
+      <p class="eyebrow">DETAIL PRODUK</p>
+      <button class="icon-button" type="button" data-product-detail-close aria-label="Tutup detail produk"><span class="emoji-icon" aria-hidden="true">✖️</span></button>
+    </div>
+    <div id="product-money-rain" class="product-money-rain" aria-hidden="true"></div>
+    <div id="product-detail-content"></div>
+  </dialog>
+
+  <dialog id="size-chart-dialog" class="size-chart-dialog" aria-labelledby="size-chart-title">
+    <div class="product-detail-dialog-head">
+      <h2 id="size-chart-title" class="eyebrow">SIZE CHART BAJU</h2>
+      <button class="icon-button" type="button" data-size-chart-close aria-label="Tutup size chart"><span class="emoji-icon" aria-hidden="true">✖️</span></button>
+    </div>
+    <img id="size-chart-image" alt="Panduan ukuran baju" hidden>
+  </dialog>
+
+  <dialog id="checkout-dialog" class="checkout-dialog" aria-labelledby="checkout-title">
+    <div class="product-detail-dialog-head">
+      <p id="checkout-title" class="eyebrow">RINGKASAN CHECKOUT</p>
+      <button class="icon-button" type="button" data-checkout-close aria-label="Tutup ringkasan checkout"><span class="emoji-icon" aria-hidden="true">✖️</span></button>
+    </div>
+    <p class="checkout-intro">Periksa produk dan varian pesanan Anda.</p>
+    <div id="checkout-items" class="checkout-item-list"></div>
+    <div class="checkout-total"><span>Total pesanan</span><strong id="checkout-total">Rp 0</strong></div>
+    <h3 class="checkout-note checkout-attention-title">Perhatian</h3>
+    <p class="checkout-note">Jika sudah melakukan pembayaran melalui QRIS, konfirmasikan pembayaran melalui WhatsApp dengan menekan tombol <strong>Kirim pesanan via WhatsApp</strong> di bawah.</p>
+    <button id="checkout-show-qris" class="popover-cta checkout-create-order" type="button" aria-expanded="false" aria-controls="checkout-qris">Tampilkan QRIS</button>
+    <section id="checkout-qris" class="checkout-qris" aria-label="Kode QRIS REDX STORE" hidden>
+      <h3>Pindai QRIS REDX STORE</h3>
+      <p>Masukkan pembayaran sebesar <strong id="checkout-qris-amount">Rp 0</strong>.</p>
+      <div class="qris-image-frame">
+        <img id="checkout-qris-image" src="assets/images/qris-code.png" alt="Kode pembayaran QRIS REDX STORE">
+      </div>
+      <p class="checkout-qris-note">QRIS statis tidak mengisi nominal otomatis. Pastikan nominal benar sebelum membayar.</p>
+      <p class="checkout-qris-note"><strong>Perhatian:</strong> Setelah transfer, kirim bukti pembayaran melalui WhatsApp ke <a id="checkout-whatsapp-link" href="https://wa.me/62895326582488" target="_blank" rel="noopener noreferrer">+62895326582488</a>. Pesan WhatsApp akan berisi detail nama produk, ukuran, dan warna pesanan.</p>
+    </section>
+    <button id="checkout-create-order" class="popover-cta checkout-create-order" type="button">Kirim pesanan via WhatsApp</button>
+    <button class="popover-cta checkout-close-button" type="button" data-checkout-close>Kembali ke toko</button>
+  </dialog>
+
+  <div id="action-notice" class="action-notice" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-client.js" defer></script>
+  <script src="assets/js/script.js" defer></script>
+</body>
+</html>
