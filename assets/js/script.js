@@ -17,7 +17,7 @@ const searchStatus = document.querySelector('#search-status');
 const searchResults = document.querySelector('#search-results');
 const productDetailDialog = document.querySelector('#product-detail-dialog');
 const productDetailContent = document.querySelector('#product-detail-content');
-const productMoneyRain = document.querySelector('#product-money-rain');
+const productMoneyRain = document.querySelector('#product-money-rain'); const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches   && !document.documentElement.classList.contains('android-motion-enabled');
 const sizeChartDialog = document.querySelector('#size-chart-dialog');
 const sizeChartImage = document.querySelector('#size-chart-image');
 const sizeChartCloseButton = document.querySelector('[data-size-chart-close]');
@@ -979,7 +979,7 @@ function createProductDetail(product) {
 
 function startProductMoneyRain() {
   productMoneyRain.replaceChildren();
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (reduceMotion) return;
 
   for (let index = 0; index < 12; index += 1) {
     const bill = createElement('span', 'product-money-bill', '💵');
@@ -2904,7 +2904,7 @@ selectAdminTab(savedAdminSessionState.activeTab);
 void initializeAdminPreview();
 
 const footerThanks = document.querySelector('.footer-thanks');
-if (footerThanks && 'IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+if (footerThanks && 'IntersectionObserver' in window && !reduceMotion) {
   const lines = [...footerThanks.querySelectorAll('.footer-thanks-line > span')];
   const messages = lines.map((line) => line.textContent);
   lines.forEach((line) => { line.textContent = ''; });
