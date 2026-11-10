@@ -5640,9 +5640,7 @@ textarea.feedback-input {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  html:not(.android-motion-enabled),   html:not(.android-motion-enabled) *,   html:not(.android-motion-enabled)::before,   html:not(.android-motion-enabled)::after,   html:not(.android-motion-enabled) *::before,   html:not(.android-motion-enabled) *::after {
     scroll-behavior: auto !important;
     animation-duration: .01ms !important;
     animation-iteration-count: 1 !important;
